@@ -1,22 +1,30 @@
 const express = require('express');
-const connectDB = require('./db/db');
-const cors = require('cors');   
 const app = express();
+const connectDB = require('./db/db');
 require('dotenv').config(); // Load environment variables from .env file
-const authRoute=require('./routes/Authroutes');
-
-const PORT = process.env.PORT;  
+const cors = require('cors');
+const cookieParser = require('cookie-parser'); // Correct import for cookie-parser
+const authRoute = require('./routes/Authroutes');
+const postRoute=require('./routes/Postroutes');
+const PORT = process.env.PORT;
+// Middleware setup
 app.use(express.json()); // Parse incoming requests with JSON payloads
-app.use(cors());     // Enable Cross-Origin Resource Sharing (CORS) for the application
-app.use("/api/v1",authRoute);
+app.use(cookieParser()); // Parse cookies
+app.use(cors({ credentials: true, origin: 'http://localhost:3000' })); // Enable CORS
+
+// Route setup
+app.use("/api/user", authRoute);
+app.use("/api/blogs",postRoute);
+
+// Start the server
 const server = () => {
    // Connect to the database
    connectDB();
-    app.listen(PORT, () => { // Start the server and listen on the specified port
-        console.log('listening to port:', PORT); // Log a message indicating the server is running
-    });
+
+   app.listen(PORT, () => {
+      console.log('Listening on port:', PORT);
+   });
 }
 
 // Call the server function to start the application
 server();
-

@@ -1,14 +1,14 @@
 const multer = require('multer');
 const path = require('path');
-
+const { v4: uuidv4 } = require('uuid');
 // Configure storage for Multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Store files in 'uploads' directory
+    cb(null, './uploads'); // Store files in 'uploads' directory
   },
   filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname); // Extract file extension
-    cb(null, `${Date.now()}${ext}`); // Rename file with a timestamp
+   const random = uuidv4();
+    cb(null, random+""+file.originalname); // Rename file with a timestamp
   }
 });
 
