@@ -33,7 +33,7 @@ export default function EditPost() {
     if (files?.[0]) {
       data.set('file', files?.[0]); // Add file to FormData if present
     }
-    const response = await fetch('http://localhost:4000/api/blogs/post'+id, {
+    const response = await fetch('http://localhost:4000/api/blogs/post', {
       method: 'PUT', // Use PUT method to update post
       body: data, // Send FormData in the request body
       credentials: 'include', // Include cookies in the request
