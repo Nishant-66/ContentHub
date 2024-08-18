@@ -33,7 +33,7 @@ export default function Header() {
   return (
     <header>
       {/* Link to the homepage */}
-      <Link to="/" className="logo">MyBlog</Link>
+      <Link to="/" className="logo">CONTENTHUB</Link>
       <nav>
         {/* Conditional rendering based on user login status */}
         {username ? (
