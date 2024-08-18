@@ -72,8 +72,8 @@ exports.getPostById = async (req, res) => {
 exports.updatePost = async (req, res) => {
     try {
         const { token } = req.cookies;
-        const { title, summary, content } = req.body;
-         const {id}=req.params;
+        const {id, title, summary, content } = req.body;
+         
 
          if (!token) {
              return res.status(401).json({ message: "Authentication token is missing" });
