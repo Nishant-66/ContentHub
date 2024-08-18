@@ -4,6 +4,7 @@ const {uploadOnCloudinary} = require('../utils/cloudinary');
 
 exports.createPost = async (req, res) => {
     try {
+        console.log(req.cookies);
        const { token } = req.cookies;
        const { title, summary, content } = req.body;
        console.log(req.file.path);
@@ -11,7 +12,7 @@ exports.createPost = async (req, res) => {
             return res.status(401).json({ message: "Authentication token is missing" });
         }
 
-       const info = jwt.verify(token, process.env.JWT_SECRET);
+       const info = jwt.verify(token, process.env.SECRET);
         
      //  Upload file to Cloudinary
          
@@ -71,23 +72,24 @@ exports.getPostById = async (req, res) => {
 exports.updatePost = async (req, res) => {
     try {
         const { token } = req.cookies;
-        const { id, title, summary, content } = req.body;
+        const { title, summary, content } = req.body;
+         const {id}=req.params;
 
-        if (!token) {
-            return res.status(401).json({ message: "Authentication token is missing" });
-        }
+         if (!token) {
+             return res.status(401).json({ message: "Authentication token is missing" });
+         }
 
-        const info = jwt.verify(token, process.env.JWT_SECRET);
+         const info = jwt.verify(token, process.env.SECRET);
 
-        // Find the post by ID
-        const postDoc = await Post.findById(id);
-        if (!postDoc) {
-            return res.status(404).json({ error: 'Post not found' });
-        }
+         // Find the post by ID
+         const postDoc = await Post.findById(id);
+         if (!postDoc) {
+             return res.status(404).json({ error: 'Post not found' });
+         }
 
-        // Check if the user is the author of the post
-        if (postDoc.author.toString() !== info.id) {
-            return res.status(403).json({ message: 'You are not authorized to update this post' });
+         // Check if the user is the author of the post
+         if (postDoc.author.toString() !== info.id) {
+             return res.status(403).json({ message: 'You are not authorized to update this post' });
         }
 
         // Handle file upload if a new file is provided
