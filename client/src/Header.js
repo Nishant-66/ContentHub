@@ -33,14 +33,14 @@ export default function Header() {
   return (
     <header>
       {/* Link to the homepage */}
-      <Link to="/" className="logo">CONTENTHUB</Link>
+      <Link to="/" className="logo">ContentHub</Link>
       <nav>
         {/* Conditional rendering based on user login status */}
         {username ? (
           <>
             {/* Links for logged-in users */}
-            <Link to="/create">Create new post</Link>
-            <a onClick={logout}>Logout ({username})</a>
+            <Link to="/create">Add Post</Link>
+            <a onClick={logout}>Logout </a>
           </>
         ) : (
           <>

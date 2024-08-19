@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const Post = require('../models/Post');
 const {uploadOnCloudinary} = require('../utils/cloudinary');
-
+const{destroyOnCloudinary}= require('../utils/cloudinary');
 exports.createPost = async (req, res) => {
     try {
         console.log(req.cookies);
@@ -117,4 +117,49 @@ exports.updatePost = async (req, res) => {
         }
         res.status(500).json({ error: 'Internal server error' });
     }
+};
+exports.deletePost = async (req, res) => {
+    const { id } = req.params;
+    
+     try {
+        const { token } = req.cookies;
+        if (!token) {
+            return res.status(401).json({ message: "Authentication token is missing" });
+        }
+
+        const info = jwt.verify(token, process.env.SECRET);
+
+        // Find the post by ID
+        const postDoc = await Post.findById(id);
+       
+        if (!postDoc) {
+            return res.status(404).json({ error: 'Post not found' });
+        }
+
+        // Check if the user is the author of the post
+        if (postDoc.author.toString() !== info.id) {
+            return res.status(403).json({ message: 'You are not authorized to delete this post' });
+        }
+
+        // Optionally delete the cover image from Cloudinary if it exists
+        if (postDoc.cover) {
+            // Extract public_id from the URL to delete the image from Cloudinary
+            const publicId = postDoc.cover.split('/').pop().split('.')[0];
+           const res= await destroyOnCloudinary(publicId);
+          
+
+        }
+
+        // Delete the post
+        await Post.findByIdAndDelete(id);
+
+        res.json({ message: 'Post deleted successfully' });
+
+    } catch (error) {
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: "Invalid token, please log in again" });
+        }
+        res.status(500).json({ error: 'Internal server error' });
+    }
+
 };

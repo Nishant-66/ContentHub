@@ -1,5 +1,5 @@
 const express = require('express');
-const { createPost, getAllPosts, getPostById, updatePost } = require('../controllers/Postcontroller');
+const { createPost, getAllPosts, getPostById, updatePost,deletePost } = require('../controllers/Postcontroller');
 const uploadMiddleware = require('../middlewares/multer');
 const app = express();
 
@@ -14,5 +14,7 @@ app.get('/posts', getAllPosts);
 
 // Route for getting a post by ID
 app.get('/post/:id', getPostById);
+
+app.delete('/post/:id', deletePost);
 
 module.exports = app;

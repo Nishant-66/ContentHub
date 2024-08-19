@@ -1,45 +1,45 @@
-import {useContext, useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
-import {formatISO9075} from "date-fns";
-import {UserContext} from "../UserContext";
-import {Link} from 'react-router-dom';
+import { useContext, useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { formatISO9075 } from "date-fns";
+import { UserContext } from "../UserContext";
+import { Link } from 'react-router-dom';
 
 export default function PostPage() {
-  // State to hold the fetched post information
   const [postInfo, setPostInfo] = useState(null);
+  const { userInfo } = useContext(UserContext);
+  const { id } = useParams();
+  const navigate = useNavigate(); // Hook to navigate programmatically
 
-  // Accessing the logged-in user's information from the context
-  const {userInfo} = useContext(UserContext);
-
-  // Getting the post ID from the URL parameters
-  const {id} = useParams();
-
-  // Fetch the post data when the component mounts or when the post ID changes
   useEffect(() => {
     fetch(`http://localhost:4000/api/blogs/post/${id}`)
-      .then(response => {
-        // Parse the JSON response and update the postInfo state
-        response.json().then(postInfo => {
-          setPostInfo(postInfo);
-        });
-      });
-  }, [id]); // Dependency array includes 'id' to refetch data if the ID changes
+      .then(response => response.json())
+      .then(postInfo => setPostInfo(postInfo));
+  }, [id]);
 
-  // If postInfo is still null (data not yet loaded), return an empty string to avoid rendering
   if (!postInfo) return '';
+
+  const handleDelete = () => {
+    fetch(`http://localhost:4000/api/blogs/post/${id}`, {
+      method: 'DELETE',
+      credentials: 'include', 
+    })
+    .then(response => {
+      if (response.ok) {
+        // Redirect to the homepage or another page after successful deletion
+        navigate('/');
+      } else {
+        // Handle error (e.g., show an error message)
+        alert('Failed to delete the post');
+      }
+    });
+  };
 
   return (
     <div className="post-page">
-      {/* Display the post title */}
       <h1>{postInfo.title}</h1>
-
-      {/* Display the formatted creation date of the post */}
       <time>{formatISO9075(new Date(postInfo.createdAt))}</time>
-
-      {/* Display the author's username */}
       <div className="author">by @{postInfo.author.username}</div>
 
-      {/* Conditionally render the Edit button if the logged-in user is the author of the post */}
       {userInfo.id === postInfo.author._id && (
         <div className="edit-row">
           <Link className="edit-btn" to={`/edit/${postInfo._id}`}>
@@ -48,16 +48,21 @@ export default function PostPage() {
             </svg>
             Edit this post
           </Link>
+          <button className="delete-btn" onClick={handleDelete}>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        Delete this post
+      </button>
         </div>
+       
       )}
 
-      {/* Display the cover image for the post */}
       <div className="image">
-        <img src={postInfo.cover} alt=""/>
+        <img src={postInfo.cover} alt="" />
       </div>
 
-      {/* Display the post content, allowing HTML rendering */}
-      <div className="content" dangerouslySetInnerHTML={{__html: postInfo.content}} />
+      <div className="content" dangerouslySetInnerHTML={{ __html: postInfo.content }} />
     </div>
   );
 }

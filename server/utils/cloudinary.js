@@ -7,7 +7,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const uploadOnCloudinary = async (localFilePath) => {
+exports.uploadOnCloudinary = async (localFilePath) => {
   try {
     const x = await cloudinary.uploader.upload(localFilePath, {
       transformation: [
@@ -27,5 +27,22 @@ const uploadOnCloudinary = async (localFilePath) => {
     return null;
   }
 };
+exports.destroyOnCloudinary = async (publicId) => {
+  try {
+    // Destroy the image using its public ID
+    const result = await cloudinary.uploader.destroy(publicId);
+    
+    if (result.result === 'ok') {
+      console.log("Image deleted successfully");
+    } else {
+      console.log("Failed to delete image:", result);
+    }
+    
+    return result;
+  } catch (error) {
+    console.error("Cloudinary delete error:", error);
+    return null;
+  }
+};
 
-module.exports = { uploadOnCloudinary };
+
